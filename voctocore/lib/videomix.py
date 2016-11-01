@@ -21,11 +21,19 @@ class PadState(object):
 
     def reset(self):
         self.alpha = 1.0
+
+        self.zorder = 1
+
         self.xpos = 0
         self.ypos = 0
-        self.zorder = 1
+
         self.width = 0
         self.height = 0
+
+        self.croptop = 0
+        self.cropleft = 0
+        self.cropbottom = 0
+        self.cropright = 0
 
 
 class VideoMix(object):
@@ -67,6 +75,7 @@ class VideoMix(object):
             pipeline += """
                 intervideosrc channel=video_{name}_mixer !
                 {caps} !
+                videocrop name=video_{idx}_cropper top=0 left=0 right=0 bottom=0 !
                 mix.
             """.format(
                 name=name,
@@ -220,6 +229,16 @@ class VideoMix(object):
                            asize[0], asize[1])
 
         try:
+            acrop = [int(i) for i in Config.get('side-by-side-preview',
+                                                'acrop').split('/', 3)]
+            self.log.debug('A-Video-Cropping configured to %u/%u/%u/%u',
+                           acrop[0], acrop[1], acrop[2], acrop[3])
+        except:
+            acrop = [0, 0, 0, 0]
+            self.log.debug('A-Video-Cropping calculated to %u/%u/%u/%u',
+                           acrop[0], acrop[1], acrop[2], acrop[3])
+
+        try:
             apos = [int(i) for i in Config.get('side-by-side-preview',
                                                'apos').split('/', 1)]
             self.log.debug('A-Video-Position configured to %u/%u',
@@ -246,6 +265,16 @@ class VideoMix(object):
                            bsize[0], bsize[1])
 
         try:
+            bcrop = [int(i) for i in Config.get('side-by-side-preview',
+                                                'bcrop').split('/', 3)]
+            self.log.debug('B-Video-Cropping configured to %u/%u/%u/%u',
+                           bcrop[0], bcrop[1], bcrop[2], bcrop[3])
+        except:
+            bcrop = [0, 0, 0, 0]
+            self.log.debug('B-Video-Cropping calculated to %u/%u/%u/%u',
+                           bcrop[0], bcrop[1], bcrop[2], bcrop[3])
+
+        try:
             bpos = [int(i) for i in Config.get('side-by-side-preview',
                                                'bpos').split('/', 1)]
             self.log.debug('B-Video-Position configured to %u/%u',
@@ -264,11 +293,13 @@ class VideoMix(object):
 
             if idx == self.sourceA:
                 pad.xpos, pad.ypos = apos
+                pad.croptop, pad.cropleft, pad.cropbottom, pad.cropright = acrop
                 pad.width, pad.height = asize
                 pad.zorder = 1
 
             elif idx == self.sourceB:
                 pad.xpos, pad.ypos = bpos
+                pad.croptop, pad.cropleft, pad.cropbottom, pad.cropright = bcrop
                 pad.width, pad.height = bsize
                 pad.zorder = 2
 
@@ -294,6 +325,16 @@ class VideoMix(object):
             ]
             self.log.debug('PIP-Size calculated to %ux%u',
                            pipsize[0], pipsize[1])
+
+        try:
+            pipcrop = [int(i) for i in Config.get('picture-in-picture',
+                                                  'pipcrop').split('/', 3)]
+            self.log.debug('PIP-Video-Cropping configured to %u/%u/%u/%u',
+                           pipcrop[0], pipcrop[1], pipcrop[2], pipcrop[3])
+        except:
+            pipcrop = [0, 0, 0, 0]
+            self.log.debug('PIP-Video-Cropping calculated to %u/%u/%u/%u',
+                           pipcrop[0], pipcrop[1], pipcrop[2], pipcrop[3])
 
         try:
             pippos = [int(i) for i in Config.get('picture-in-picture',
@@ -340,6 +381,15 @@ class VideoMix(object):
             mixerpad.set_property('height', state.height)
             mixerpad.set_property('alpha', state.alpha)
             mixerpad.set_property('zorder', state.zorder)
+
+            cropper = self.mixingPipeline.get_by_name("video_%u_cropper" % idx)
+
+            self.log.info("Reconfiguring Cropper %d to %d/%d/%d/%d",
+                          idx, state.croptop, state.cropleft, state.cropbottom, state.cropright)
+            cropper.set_property("top", state.croptop)
+            cropper.set_property("left", state.cropleft)
+            cropper.set_property("bottom", state.cropbottom)
+            cropper.set_property("right", state.cropright)
 
     def selectCompositeModeDefaultSources(self):
         sectionNames = {
