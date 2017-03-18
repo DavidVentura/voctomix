@@ -102,9 +102,30 @@ class ControlServerCommands(object):
         helplines.append('\t' + 'quit / exit')
 
         helplines.append("\n")
-        helplines.append("Source-Names:")
+
+        video_only = []
+        audio_only = []
+
+        try:
+            audio_only = Config.getlist('mix', 'audio_only')
+            video_only = Config.getlist('mix', 'video_only')
+        except Exception:
+            pass
+
+        helplines.append("Mixed-Source Names:")
         for source in self.sources:
-            helplines.append("\t" + source)
+            if source not in audio_only and source not in video_only:
+                helplines.append("\t" + source)
+
+        helplines.append("Video-Source Names:")
+        for source in self.sources:
+            if source in video_only:
+                helplines.append("\t" + source)
+
+        helplines.append("Audio-Source Names:")
+        for source in self.sources:
+            if source in audio_only:
+                helplines.append("\t" + source)
 
         if Config.getboolean('stream-blanker', 'enabled'):
             helplines.append("\n")
