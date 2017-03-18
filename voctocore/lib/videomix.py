@@ -75,7 +75,7 @@ class VideoMix(object):
             pipeline += """
                 intervideosrc channel=video_{name}_mixer !
                 {caps} !
-                videocrop name=video_{idx}_cropper top=0 left=0 right=0 bottom=0 !
+                videocrop name=video_{idx}_cropper !
                 mix.
             """.format(
                 name=name,
@@ -370,6 +370,7 @@ class VideoMix(object):
                             .get_by_name('mix')
                             .get_static_pad('sink_%u' % (idx + 1)))
 
+            cropper = self.mixingPipeline.get_by_name("video_%u_cropper" % idx)
             self.log.debug('Reconfiguring Mixerpad %u to '
                            'x/y=%u/%u, w/h=%u/%u alpha=%0.2f, zorder=%u',
                            idx, state.xpos, state.ypos,
@@ -381,8 +382,6 @@ class VideoMix(object):
             mixerpad.set_property('height', state.height)
             mixerpad.set_property('alpha', state.alpha)
             mixerpad.set_property('zorder', state.zorder)
-
-            cropper = self.mixingPipeline.get_by_name("video_%u_cropper" % idx)
 
             self.log.info("Reconfiguring Cropper %d to %d/%d/%d/%d",
                           idx, state.croptop, state.cropleft, state.cropbottom, state.cropright)
