@@ -35,7 +35,7 @@ def read_stdin():
     stdin = os.fdopen(sys.stdin.fileno(), 'rb')
     while working:
         try:
-            data = stdin.read(4096)
+            data = stdin.read(1024)
         except:
             die()
         if not data:
