@@ -28,8 +28,15 @@ pipeline.set_state(Gst.State.PLAYING)
 idx = 0
 
 while True:
-    input()
-    idx = (idx + 1) % len(sources)
+    print("Waiting for input")
+    i = input()
+    if i == "2":
+        idx = 1
+    elif i == "1":
+        idx = 0
+    else:
+        print("Invalid input")
+        continue
     switch = pipeline.get_by_name('in')
     newpad = switch.get_static_pad('sink_%d' % idx)
     switch.set_property("active-pad", newpad)
