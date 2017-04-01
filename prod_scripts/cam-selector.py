@@ -10,6 +10,10 @@ sources = [ 'udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer 
             'udpsrc port=5002 ! application/x-rtp, payload=96 ! rtpjitterbuffer latency=30 ! rtph264depay ! avdec_h264',
           ]
 
+sources = [ 'tcpclientsrc host=192.168.2.208 port=5000 ! queue ! matroskademux ! avdec_h264',
+            'tcpclientsrc host=192.168.2.209 port=5000 ! queue ! matroskademux ! avdec_h264',
+          ]
+
 output = '''videoconvert !
             video/x-raw,format=I420,width={WIDTH},height={HEIGHT},framerate={FRAMERATE}/1,pixel-aspect-ratio=1/1 !
             mux.
