@@ -27,7 +27,14 @@ case "$modes" in
                 comm set_video_a slides
                 comm set_video_b cam1
                 comm set_audio_volume mic1 1
+				comm set_stream_live
         ;;
+		blank)
+				comm set_stream_blank nostream
+		;;
+		live)
+				comm set_stream_live
+		;;
         *)
                 echo '? invalido'
         ;;

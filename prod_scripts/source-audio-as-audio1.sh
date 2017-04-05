@@ -11,11 +11,11 @@ DELAY="! queue max-size-buffers=0 max-size-time=0 max-size-bytes=0 min-threshold
 DELAY="! queue max-size-buffers=0 max-size-time=0 max-size-bytes=0 min-threshold-time=0400000000"
 DELAY=""
 
-gst-launch-1.0 \
+gst-launch-1.0 -qe \
 	udpsrc port=5003 ! \
 		audio/x-raw,format=S16LE,channels=2,layout=interleaved,rate=$AUDIORATE !\
 		audioconvert $DELAY !\
-		volume volume=1.2 ! \
+		volume volume=2 ! \
 		mux. \
 	\
 	matroskamux name=mux !\

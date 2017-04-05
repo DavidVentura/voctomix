@@ -16,7 +16,7 @@ HEIGHT=720
 FRAMERATE=20
 FRAMERATE=25
 BG=$(dirname "$0")"/bg.raw"
-ffmpeg -re -y -f image2 -loop 1 -pixel_format yuv420p \
+ffmpeg -loglevel error -re -y -f image2 -loop 1 -pixel_format yuv420p \
 	-framerate ${FRAMERATE} -video_size ${WIDTH}x${HEIGHT} \
 	-i "$BG" \
 	-c:v rawvideo -pix_fmt yuv420p \
