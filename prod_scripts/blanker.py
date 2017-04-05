@@ -8,12 +8,6 @@ import threading
 import os
 import stat
 
-WIDTH  = 1280
-HEIGHT = 720
-
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-
 def bus_call(bus, msg, *args):
 	if msg.type == Gst.MessageType.EOS:
 		print("End-of-stream")
@@ -65,11 +59,11 @@ if __name__ == "__main__":
 	# initialization
 	Gst.init(None)
 
-	p = '''multifilesrc location="/var/voctomix/blanker.h264" loop=1 !
+	p = '''multifilesrc location="/var/voctomix/prod_scripts/blanker.h264" loop=1 !
 		h264parse ! avdec_h264 !
 		videoconvert ! videorate !
 		video/x-raw,format=I420,width={WIDTH},height={HEIGHT},framerate={FRAMERATE}/1,pixel-aspect-ratio=1/1 !
-		textoverlay text="La transmisión iniciará en 3 minutos" valignment=position ypos=0.6 name=text font-desc="sans-serif 14" !
+		textoverlay text="La transmisión iniciará en 3 minutos" valignment=position ypos=0.6 font-desc="sans-serif 14" name=text !
 		matroskamux !
 		tcpclientsink host=localhost port=17000'''.format(WIDTH=1280, HEIGHT=720, FRAMERATE=25)
 	print(p)

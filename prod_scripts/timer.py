@@ -3,15 +3,17 @@ import datetime
 import sys
 
 def minutes(t):
-
-
 	hour = int(t.split(":")[0])
 	minute = int(t.split(":")[1])
 
 	now     = datetime.datetime.now()
 	target  = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
 	
-	minutes_left = int((target-now).seconds/60)
+	delta = target-now
+	if delta.days < 0:
+		return 1 #1 minute if we have gone over the top
+
+	minutes_left = int(delta.seconds/60)
 	minutes_left = max(minutes_left, 1)
 	return minutes_left
 
@@ -32,9 +34,14 @@ if __name__ == "__main__":
 		sys.exit(1)
 
 	try:
-		m = minutes(t)
+		m = max(minutes(t), 1)
 	except Exception as e:
 		print(e)
 		sys.exit(1)
 
-	print("text=%s" % (text % m))
+
+	text = (text % m)
+	if m == 1:
+		text = text.replace("minutos", "minuto")
+
+	print("text=%s" % text)
