@@ -1,5 +1,5 @@
 #!/bin/sh
-ffmpeg -y -nostdin \
+ffmpeg -y -nostdin -hide_banner -loglevel warning -stats \
 	-i tcp://localhost:15000 \
 	-threads:0 0 \
 	-aspect 16:9 \
