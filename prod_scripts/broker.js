@@ -11,11 +11,11 @@ wss.on('connection', function conn(ws) {
 	ws.type = "";
 	ws.send(JSON.stringify(data));
 	ws.on('message', function incoming(msg) {
-		console.log("Got: ", msg, " from: ", ws.hostname);
+		//console.log("Got: ", msg, " from: ", ws.hostname);
 		try {
 			json = JSON.parse(msg);
 		} catch(e)  {
-			console.log("Invalid JSON!");
+			//console.log("Invalid JSON!");
 			return;
 		}
 
@@ -41,11 +41,19 @@ wss.on('connection', function conn(ws) {
 			case "error":
 				break;
 			case "append":
-				let el = data[ws.hostname].find( (e) => { e.pid === json.pid } );
+				let el = data[ws.hostname].find( (e) => { return e.pid === json.pid } );
+
 				if ( el !== undefined ) {
-					el[json.stream].push(json.data);	
+					//console.log("Process exists! appending");
+					if (json.data.endsWith("\r"))
+						el[json.stream][ el[json.stream].length -1 ] = json.data; //Replace last line instead of pushing a new one
+					else
+						el[json.stream].push(json.data);
 				} else {
-					data[ws.hostname].push(json);
+					//console.log(`Creating ${json.stream} for pid ${json.pid}`);
+					let obj = { pid: json.pid };
+					obj[json.stream] = [json.data];
+					data[ws.hostname].push(obj);
 				}
 				wss.broadcast(json);
 				break;
