@@ -103,7 +103,21 @@ function printableProcesses() {
 }
 
 ws.on('message', function incoming(data, flags) {
-	console.log(data);
+	console.log("Got data:", data);
+	const json = JSON.parse(data);
+	if ( json.type === undefined ) {
+		console.log("No type");
+		return;
+	}
+	switch(json.type) {
+		case "launch":
+			launch(json.command, json.args, cb1);
+			break;
+		default:
+			console.log("Got invalid data!!");
+			break;
+	}
+	
 });
 
 ws.sendObj = function(o) {
