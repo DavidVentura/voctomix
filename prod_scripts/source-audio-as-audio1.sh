@@ -15,7 +15,6 @@ gst-launch-1.0 -qe \
 	udpsrc port=5003 ! \
 		audio/x-raw,format=S16LE,channels=2,layout=interleaved,rate=$AUDIORATE !\
 		audioconvert $DELAY !\
-		volume volume=1.2 ! \
 		mux. \
 	\
 	matroskamux name=mux !\
