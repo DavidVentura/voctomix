@@ -29,9 +29,7 @@ def set_text(t):
 def control():
 	FIFO="/tmp/blankerfifo"
 	if os.path.exists(FIFO):
-		if stat.S_ISFIFO(os.stat(FIFO).st_mode):
-			pass
-		else:
+		if not stat.S_ISFIFO(os.stat(FIFO).st_mode):
 			os.remove(FIFO)
 			os.mkfifo(FIFO)
 	else:
