@@ -35,10 +35,19 @@ wss.on('connection', function conn(ws) {
 				ws.type = "node";
 				ws.hostname = json.hostname;
 				data[ws.hostname] = [];
+				wss.broadcast(data);
 				break;
 			case "close":
-				break;
 			case "error":
+				wss.broadcast(json);
+				let elem = data[ws.hostname].find( (e) => { return e.pid === json.pid } );
+				if ( elem ) {
+					elem.exited = true;
+					if ( ! json[json.type] )
+						json[json.type] = json.code;
+
+					elem[json.type] = json[json.type];
+				}
 				break;
 			case "append":
 				let el = data[ws.hostname].find( (e) => { return e.pid === json.pid } );
