@@ -20,6 +20,11 @@ wss.on('connection', function conn(ws) {
 		}
 
 		switch(json.type) {
+			case "started":
+				if ( json.data == undefined )
+					break;
+				data[ws.hostname].push(json.data);
+				break;
 			case "launch":
 				if (json.command == undefined || json.args == undefined || json.hostname == undefined){
 					console.log("Invalid launch message");
