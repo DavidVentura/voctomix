@@ -19,8 +19,11 @@ function launch(command, opts, cb) {
 		process,
 		stdout: [],
 		stderr: [],
-		hostname: HOSTNAME
+		hostname: HOSTNAME,
+		pid: process.pid
 	};
+
+	ws.sendObj({ type: "started", data: np  });
 
 	for( key in cb ) {
 		if ( typeof cb[key] === "function" ) {
