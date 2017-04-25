@@ -13,11 +13,13 @@ sources = [ 'udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer 
 sources = [ 'tcpclientsrc host=192.168.2.208 port=5000 ! queue ! matroskademux ! avdec_h264',
             'tcpclientsrc host=192.168.2.209 port=5000 ! queue ! matroskademux ! avdec_h264',
           ]
+sources = [ 'tcpclientsrc host=192.168.2.208 port=5000 ! queue ! matroskademux ',
+            'tcpclientsrc host=192.168.2.209 port=5000 ! queue ! matroskademux',
+          ]
 
-output = '''videoconvert !
+output = '''avdec_h264 ! videoconvert !
             video/x-raw,format=I420,width={WIDTH},height={HEIGHT},framerate={FRAMERATE}/1,pixel-aspect-ratio=1/1 !
-            mux.
-            matroskamux name=mux !
+            matroskamux !
             tcpclientsink host=localhost port=10001
             '''.format(WIDTH=1280,HEIGHT=720,FRAMERATE=25)
 
