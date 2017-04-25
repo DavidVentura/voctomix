@@ -24,27 +24,27 @@ class Directory(object):
         self.scheduled = False
         self.rescan()
 
-        self.log.debug('setting up inotify watch for %s', self.path)
-        wm = pyinotify.WatchManager()
-        notifier = pyinotify.Notifier(
-            wm,
-            timeout=10,
-            default_proc_fun=self.inotify_callback
-        )
+        #self.log.debug('setting up inotify watch for %s', self.path)
+        #wm = pyinotify.WatchManager()
+        #notifier = pyinotify.Notifier(
+        #    wm,
+        #    timeout=10,
+        #    default_proc_fun=self.inotify_callback
+        #)
 
-        wm.add_watch(
-            self.path,
-            # pyinotify.ALL_EVENTS,
-            pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_MODIFY,
-            rec=True
-        )
+        #wm.add_watch(
+        #    self.path,
+        #    # pyinotify.ALL_EVENTS,
+        #    pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_MODIFY,
+        #    rec=True
+        #)
 
-        GLib.io_add_watch(
-            notifier._fd,
-            GLib.IO_IN,
-            self.io_callback,
-            notifier
-        )
+        #GLib.io_add_watch(
+        #    notifier._fd,
+        #    GLib.IO_IN,
+        #    self.io_callback,
+        #    notifier
+        #)
 
     def inotify_callback(self, notifier):
         self.log.info('inotify callback %s: %s',
