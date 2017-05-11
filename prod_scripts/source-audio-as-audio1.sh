@@ -10,12 +10,9 @@ DELAY="! queue max-size-buffers=0 max-size-time=0 max-size-bytes=0 min-threshold
 DELAY="! queue max-size-buffers=0 max-size-time=0 max-size-bytes=0 min-threshold-time=1400000000"
 DELAY="! queue max-size-buffers=0 max-size-time=0 max-size-bytes=0 min-threshold-time=0400000000"
 DELAY=""
+HOST='192.168.2.79'
 
 gst-launch-1.0 -qe \
-	udpsrc port=5003 ! \
-		audio/x-raw,format=S16LE,channels=2,layout=interleaved,rate=$AUDIORATE !\
-		audioconvert $DELAY !\
-		mux. \
-	\
-	matroskamux name=mux !\
+	tcpclientsrc host=$HOST port=5000 do-timestamp=true ! queue ! matroskaparse ! matroskademux ! queue ! opusdec $DELAY ! \
+	queue ! matroskamux streamable=true !\
 		tcpclientsink host=localhost port=10003
