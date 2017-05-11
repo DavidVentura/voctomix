@@ -10,6 +10,7 @@ fi
 function comm {
         # echo $@
         echo "$@" | netcat -q0 localhost 9999
+		sleep 0.01
 }
 modes="$1"
 case "$modes" in
@@ -21,6 +22,7 @@ case "$modes" in
         full)
                 comm set_video_a cam1
                 comm set_composite_mode fullscreen
+                comm set_audio_volume mic1 1
         ;;
         start)
                 comm set_composite_mode side_by_side_preview
