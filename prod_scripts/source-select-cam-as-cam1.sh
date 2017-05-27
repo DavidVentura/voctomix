@@ -5,7 +5,6 @@ if [ -f $confdir/config.sh ]; then
 	. $confdir/config.sh
 fi
 
-#IN = 1280x720
 HOST="192.168.2.208"
 if [ $# -eq 1 ]; then
     if [ $1 -eq 2 ]; then
