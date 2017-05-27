@@ -3,6 +3,7 @@ import gi
 import time
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
+from pyvars import *
 
 Gst.init(None)
 
@@ -21,7 +22,7 @@ output = '''avdec_h264 ! videoconvert !
             video/x-raw,format=I420,width={WIDTH},height={HEIGHT},framerate={FRAMERATE}/1,pixel-aspect-ratio=1/1 !
             matroskamux !
             tcpclientsink host=localhost port=10001
-            '''.format(WIDTH=1280,HEIGHT=720,FRAMERATE=25)
+            '''.format(WIDTH=WIDTH,HEIGHT=HEIGHT,FRAMERATE=FRAMERATE)
 
 # output = 'videocrop left=200 right=200 ! autovideosink'
 s_sources = ' ! in. '.join(sources)

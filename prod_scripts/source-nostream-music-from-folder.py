@@ -103,7 +103,7 @@ class LoopSource(object):
             audioconvert !
             audio/x-raw,format=S16LE,channels=2,rate=48000,
                 layout=interleaved !
-			volume volume=0.1 !
+			volume volume=0.08 !
             matroskamux !
             tcpclientsink host=localhost port=18000
         """
