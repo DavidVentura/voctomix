@@ -16,7 +16,6 @@ function launch(command, opts, cb) {
 	var np = {
 		command,
 		opts,
-		process,
 		stdout: [],
 		stderr: [],
 		hostname: HOSTNAME,
@@ -24,6 +23,8 @@ function launch(command, opts, cb) {
 	};
 
 	ws.sendObj({ type: "started", data: np  });
+
+    np.process = process;
 
 	for( key in cb ) {
 		if ( typeof cb[key] === "function" ) {
@@ -90,8 +91,14 @@ function launchCore() {
 
 //setTimeout(launchCore, 1000);
 
-
-const ws = new WebSocket('ws://192.168.2.123:8888');
+let ws;
+try {
+    ws = new WebSocket('ws://192.168.2.120:8888');
+} catch (e) {
+    console.log('error!!');
+    console.log(e.message);
+    process.exit(1);
+}
 
 ws.on('open', function open() {
 	ws.sendObj({type: "node", hostname: HOSTNAME});
