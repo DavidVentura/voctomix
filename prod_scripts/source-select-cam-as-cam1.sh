@@ -15,9 +15,9 @@ fi
 
 
 gst-launch-1.0 -qe \
-	tcpclientsrc host=$HOST port=5000 do-timestamp=true ! queue ! matroskademux ! avdec_h264 ! \
+	tcpclientsrc blocksize=16384 host=$HOST port=5000 do-timestamp=true ! queue ! matroskademux ! avdec_h264 ! \
 		videoconvert !\
 		video/x-raw,format=I420,width=$WIDTH,height=$HEIGHT,framerate=$FRAMERATE/1,pixel-aspect-ratio=1/1 ! \
 		mux. \
 	matroskamux name=mux !\
-		tcpclientsink host=localhost port=10001
+		tcpclientsink blocksize=16384 host=localhost port=10001

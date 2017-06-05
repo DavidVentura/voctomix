@@ -105,7 +105,7 @@ class LoopSource(object):
                 layout=interleaved !
 			volume volume=0.08 !
             matroskamux !
-            tcpclientsink host=localhost port=18000
+            tcpclientsink blocksize=16384 host=localhost port=18000
         """
 
         # Parsing Pipeline
