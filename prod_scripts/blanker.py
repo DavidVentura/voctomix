@@ -75,6 +75,7 @@ if __name__ == "__main__":
 	# run
 	pipeline.set_state(Gst.State.PLAYING)
 	t = threading.Thread(target=control, daemon=True)
+	time.sleep(1)
 	t.start()
 	while True:
 		time.sleep(10000)
