@@ -10,7 +10,7 @@ fi
 function comm {
         # echo $@
         echo "$@" | netcat -q0 localhost 9999
-		sleep 0.01
+        sleep 0.01
 }
 modes="$1"
 case "$modes" in
@@ -30,14 +30,14 @@ case "$modes" in
                 comm set_video_b cam1
                 comm set_audio_volume mic1 1
                 comm set_audio_volume slides 0.1
-				comm set_stream_live
+                comm set_stream_live
         ;;
-		blank)
-				comm set_stream_blank nostream
-		;;
-		live)
-				comm set_stream_live
-		;;
+        blank)
+                comm set_stream_blank nostream
+        ;;
+        live)
+                comm set_stream_live
+        ;;
         *)
                 echo '? invalido'
         ;;
