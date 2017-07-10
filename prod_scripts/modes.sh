@@ -29,6 +29,7 @@ case "$modes" in
                 comm set_video_a slides
                 comm set_video_b cam1
                 comm set_audio_volume mic1 1
+                comm set_audio_volume slides 0.1
 				comm set_stream_live
         ;;
 		blank)
