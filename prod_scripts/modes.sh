@@ -12,6 +12,10 @@ function comm {
         echo "$@" | netcat -q0 localhost 9999
         sleep 0.01
 }
+function log {
+    curl -s -i -XPOST 'http://graphs.eba:8086/write?db=curso' --data-binary "$1" >/dev/null &
+}
+
 modes="$1"
 case "$modes" in
         slides)
@@ -29,14 +33,17 @@ case "$modes" in
                 comm set_video_a slides
                 comm set_video_b cam1
                 comm set_audio_volume mic1 1
-                comm set_audio_volume slides 0.1
+                comm set_audio_volume slides 0.2
                 comm set_stream_live
+                log "curso,type=streaming_status value=1"
         ;;
         blank)
                 comm set_stream_blank nostream
+                log "curso,type=streaming_status value=0"
         ;;
         live)
                 comm set_stream_live
+                log "curso,type=streaming_status value=1"
         ;;
         *)
                 echo '? invalido'
