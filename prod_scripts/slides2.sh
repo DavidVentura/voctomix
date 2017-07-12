@@ -7,6 +7,7 @@ fi
 
 AUDIOSRC='audiotestsrc freq=400 volume=0'
 AUDIOSRC='d. ! queue ! mpegaudioparse ! avdec_mp3 ! queue' 
+WITH_AUDIO=""
 gst-launch-1.0 -qe \
     udpsrc address=239.255.42.42 port=5004 do-timestamp=true ! queue !\
     tsdemux name=d !\
@@ -17,4 +18,3 @@ gst-launch-1.0 -qe \
     audioconvert ! audioresample ! audiorate!\
     audio/x-raw,format=S16LE,channels=2,layout=interleaved,rate=$AUDIORATE !\
     matroskamux name=m ! queue ! tcpclientsink blocksize=16384 host=localhost port=10000
-    #queue ! audioconvert ! audioresample ! audiorate ! \
