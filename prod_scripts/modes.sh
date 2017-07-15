@@ -36,14 +36,17 @@ case "$modes" in
                 comm set_audio_volume slides 0.2
                 comm set_stream_live
                 log "curso,type=streaming_status value=1"
+                echo '1' >/tmp/streaming_status
         ;;
         blank)
                 comm set_stream_blank nostream
                 log "curso,type=streaming_status value=0"
+                echo '0' >/tmp/streaming_status
         ;;
         live)
                 comm set_stream_live
                 log "curso,type=streaming_status value=1"
+                echo '1' >/tmp/streaming_status
         ;;
         *)
                 echo '? invalido'

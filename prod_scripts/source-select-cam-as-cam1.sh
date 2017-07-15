@@ -14,7 +14,7 @@ if [ $# -eq 1 ]; then
 fi
 
 
-gst-launch-1.0 -qe \
+gst-launch-1.0 -q \
 	tcpclientsrc blocksize=16384 host=$HOST port=5000 do-timestamp=true ! queue ! matroskademux ! avdec_h264 ! \
 		videoconvert !\
 		video/x-raw,format=I420,width=$WIDTH,height=$HEIGHT,framerate=$FRAMERATE/1,pixel-aspect-ratio=1/1 ! \

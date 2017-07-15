@@ -6,8 +6,8 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
-FONT1="Museo Sans, 11"
-FONT2="Museo Sans Cyrl 100 11"
+FONT1="Museo Sans"
+FONT2="Museo Sans Cyrl 100"
 BLACK="4278190080"
 
 TITLE="Estás viendo:"
@@ -21,8 +21,8 @@ if [ $length -gt $MAXLENGTH ]; then
 fi
 
 gst-launch-1.0 -q filesrc location='/home/nginx/str.png' ! pngdec ! videoconvert ! video/x-raw,format=I420 ! imagefreeze ! video/x-raw,framerate=25/1 !\
-    textoverlay text="$CLASS"\
+    textoverlay text="<span size='11000'>$CLASS</span>"\
     valignment=absolute halignment=4 y-absolute=0.91 x-absolute=0 deltax=15 font-desc="$FONT1" draw-shadow=false draw-outline=false color="$BLACK" !\
-    textoverlay text="$TITLE"\
+    textoverlay text="<span size='11000'>$TITLE</span>"\
     valignment=absolute halignment=4 y-absolute=0.85 x-absolute=0 deltax=15 font-desc="$FONT2" draw-shadow=false draw-outline=false color="$BLACK" !\
     queue ! matroskamux ! tcpclientsink blocksize=16384 host=localhost port=16000
