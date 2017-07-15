@@ -20,7 +20,7 @@ if [ $length -gt $MAXLENGTH ]; then
     exit 1
 fi
 
-gst-launch-1.0 -q filesrc location='/home/nginx/str.png' ! pngdec ! videoconvert ! video/x-raw,format=I420 ! imagefreeze ! video/x-raw,framerate=25/1 !\
+gst-launch-1.0 -q filesrc location='../str.png' ! pngdec ! videoconvert ! video/x-raw,format=I420 ! imagefreeze ! video/x-raw,framerate=25/1 !\
     textoverlay text="<span size='11000'>$CLASS</span>"\
     valignment=absolute halignment=4 y-absolute=0.91 x-absolute=0 deltax=15 font-desc="$FONT1" draw-shadow=false draw-outline=false color="$BLACK" !\
     textoverlay text="<span size='11000'>$TITLE</span>"\
