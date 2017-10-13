@@ -28,12 +28,18 @@ case "$modes" in
                 comm set_composite_mode fullscreen
                 comm set_audio_volume mic1 1
         ;;
+        fullslides)
+                comm set_video_a slides
+                comm set_composite_mode fullscreen
+                comm set_audio_volume mic1 1
+                comm set_audio_volume slides 1
+        ;;
         start)
                 comm set_composite_mode side_by_side_preview
                 comm set_video_a slides
                 comm set_video_b cam1
                 comm set_audio_volume mic1 1
-                comm set_audio_volume slides 0.2
+                comm set_audio_volume slides 0.3
                 comm set_stream_live
                 log "curso,type=streaming_status value=1"
                 echo '1' >/tmp/streaming_status
