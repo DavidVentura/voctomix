@@ -43,10 +43,11 @@ if __name__ == "__main__":
 
     while True:
         fifo = open("/tmp/blankerfifo", "w")
-        outtext = (text % m)
+        outtext = (text % str(m))
         if m == 1:
-            outtext = text.replace("minutos", "minuto")
-            break
+            outtext = outtext.replace("minutos", "minuto")
         fifo.write("text=%s\n" % outtext)
         fifo.close()
+        if m == 1:
+            break
         time.sleep(30)
