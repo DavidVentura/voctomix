@@ -46,7 +46,7 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
+    # print(msg.topic+" "+str(msg.payload))
     if msg.topic == "video/cam-selector":
         switch_camera(msg.payload)
 
@@ -58,7 +58,6 @@ client.connect("192.168.2.123", 1883, 60)
 
 
 def switch_camera(target):
-    print(target)
     try:
         idx = int(target)
         idx -= 1
@@ -71,7 +70,6 @@ def switch_camera(target):
     switch.set_property("active-pad", newpad)
     print("Switched to %d" % idx)
 
-print("Waiting for input on /tmp/camselectorfifo")
 t = threading.Thread(target=client.loop_forever, daemon=False)
 time.sleep(1)
 t.start()
