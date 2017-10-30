@@ -11,7 +11,7 @@ gst-launch-1.0 -q \
     udpsrc address=239.255.42.42 port=5004 do-timestamp=true ! queue !\
     tsdemux name=d !\
     queue ! h264parse ! avdec_h264 !\
-    videocrop top=64 left=64 right=64 bottom=64 !\
+    videocrop top=48 left=64 right=64 bottom=48 !\
     videoflip method=rotate-180 !\
 	videorate ! videoscale add-borders=false ! videoconvert !\
 	video/x-raw,format=I420,width=$WIDTH,height=$HEIGHT,framerate=$FRAMERATE/1,pixel-aspect-ratio=1/1 !\
