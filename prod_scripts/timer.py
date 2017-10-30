@@ -19,6 +19,14 @@ def minutes(t):
     return minutes_left
 
 if __name__ == "__main__":
+
+    if len(sys.argv) == 2:
+        fifo = open("/tmp/blankerfifo", "w")
+        fifo.write("text=%s\n" % sys.argv[1])
+        fifo.flush()
+        fifo.close()
+        exit(0)
+
     if len(sys.argv) != 3:
         print("usage: %s HH:MM Text" % sys.argv[0])
         print("Text must contain exactly one '%s'")
