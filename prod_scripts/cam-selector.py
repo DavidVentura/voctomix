@@ -48,7 +48,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.payload))
     if msg.topic == "video/cam-selector":
-        switch_camera(str(msg.payload))
+        switch_camera(msg.payload)
 
 client = mqtt.Client()
 client.on_connect = on_connect
@@ -58,10 +58,12 @@ client.connect("192.168.2.123", 1883, 60)
 
 
 def switch_camera(target):
+    print(target)
     try:
         idx = int(target)
         idx -= 1
-    except:
+    except Exception as e:
+        print(e)
         idx = 0
     idx = max(0, min(1, idx))
     switch = pipeline.get_by_name('in')
