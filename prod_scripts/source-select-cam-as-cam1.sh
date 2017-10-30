@@ -13,7 +13,8 @@ if [ $# -eq 1 ]; then
     fi
 fi
 
-
+# the queue adds 100ms
+# queue max-size-buffers=0 max-size-time=0 max-size-bytes=0 min-threshold-time=100000000 ! \
 gst-launch-1.0 -q \
 	tcpclientsrc blocksize=16384 host=$HOST port=5000 do-timestamp=true ! queue ! matroskademux ! avdec_h264 ! \
 		videoconvert !\
