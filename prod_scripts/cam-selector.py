@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import gi
 import time
+import threading
+import stat
+import os
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from pyvars import *
@@ -47,9 +50,6 @@ def control():
         with open(FIFO) as fifo:
             line=fifo.read().strip()
             print("Got: ", line)
-            if "=" not in line:
-                 print("Invalid line.")
-                 continue
             val = line.strip()
             if val == "2":
                 switch_camera(val)
