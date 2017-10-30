@@ -34,19 +34,19 @@ if __name__ == "__main__":
         print("Text must contain exactly one '%s'")
         sys.exit(1)
 
-    try:
-        m = max(minutes(t), 1)
-    except Exception as e:
-        print(e)
-        sys.exit(1)
-
-
     while True:
+        try:
+            m = max(minutes(t), 1)
+        except Exception as e:
+            print(e)
+            sys.exit(1)
+
         fifo = open("/tmp/blankerfifo", "w")
         outtext = (text % str(m))
         if m == 1:
             outtext = outtext.replace("minutos", "minuto")
         fifo.write("text=%s\n" % outtext)
+        print(outtext)
         fifo.close()
         if m == 1:
             break
