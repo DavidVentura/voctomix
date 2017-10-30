@@ -9,6 +9,12 @@ import os
 import stat
 from pyvars import *
 
+def on_error(bus, message):
+    print('received Error-Event on bus, exiting')
+    (error, debug) = message.parse_error()
+    print('Error-Details: #%u: %s', error.code, debug)
+    sys.exit(1)
+
 def bus_call(bus, msg, *args):
 	if msg.type == Gst.MessageType.EOS:
 		print("End-of-stream")
@@ -71,8 +77,8 @@ if __name__ == "__main__":
 		print ("Failed to create pipeline")
 		sys.exit(0)
 
-
 	# run
+	pipeline.bus.connect("message::error", on_error)
 	pipeline.set_state(Gst.State.PLAYING)
 	t = threading.Thread(target=control, daemon=True)
 	time.sleep(1)
