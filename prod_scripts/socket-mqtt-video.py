@@ -4,6 +4,8 @@ import subprocess
 import paho.mqtt.client as mqtt
 import os.path
 import shlex
+import json
+import time
 from pprint import pprint
 BASEDIR = '/home/nginx/voctomix/prod_scripts/'
 pmap = {
@@ -15,7 +17,6 @@ pmap = {
         "r_blank_t": ['./timer.py'],
         "p_stream": ['./stream-sd.sh']
         }
-pstate = {}
 ptable = {}
 
 
@@ -33,7 +34,6 @@ def popenAndCall(key, args):
         proc = subprocess.Popen(popenArgs, cwd=BASEDIR)
         ptable[key] = proc
         proc.wait()
-        pstate[key] = False
         if key in ptable:
             del ptable[key]
     thread = threading.Thread(target=runInThread, args=(key, args))
@@ -52,43 +52,64 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    print(msg.topic, str(msg.payload))
+    if msg.topic == "video/heartbeat":
+        # FIXME
+        return
+
     payload = msg.payload.decode('utf-8', errors='replace')
+    try:
+        data = json.loads(payload)
+    except Exception as e:
+        print("JSON Parse failed", payload)
+        return
+
+    print(msg.topic, data)
     if msg.topic == "video/stop":
-        key = payload
-        if key not in pstate or not pstate[key] or key not in ptable:
-            print("Process %s not running!" % key)
+        key = data
+        if key not in ptable:
+            print("Process %s not running(2)!" % key)
+            pprint(ptable)
             return
 
         ptable[key].terminate()  # kill the process
         time.sleep(0.1)
-        if ptable[key] is not None and ptable[key].poll() is not None:
+        if key in ptable and ptable[key] is not None and ptable[key].poll() is not None:
             # did the process REALLY die?
-            pstate[payload] = False
+            del ptable[key]
 
     if msg.topic == "video/launch":
         # example payload:
         # r_slides_bg PEFE - Abordaje Cosmiátrico
-        key = payload.split()[0]
+        if 'key' not in data:
+            print("No key in data")
+            return
+        key = data['key']
+        print("Launch key:", key)
         if key not in pmap:
             print("%s not in pmap" % key)
             pprint(pmap)
             return
 
-        if key in pstate:
+        if key in ptable:
             print("Process %s already running!" % key)
             return
 
-        args = shlex.split(" ".join(payload.split()[1:]))
+        if 'args' in data:
+            args = data['args']
+        else:
+            args = []
         print("Calling popen with args = ", args)
         popenAndCall(key, args)
-        pstate[key] = True
     elif msg.topic == "video/mode":
         print("mode!")
-        nc(payload)
-        pstate['mode'] = payload
+        nc(data)
+        # pstate['mode'] = data
     elif msg.topic == "video/exited":
-        pstate[payload] = False
+        if data in ptable:
+            del ptable[data]
+
+    pstate = {k: True for k, v in ptable.items() if v is not None}
+    client.publish('mqtt_state', json.dumps(pstate))
     pprint(pstate)
     print("#"*50)
 
