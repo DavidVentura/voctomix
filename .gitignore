@@ -53,3 +53,7 @@ target/
 
 # this ain't an example anymore:
 example-scripts/config.sh
+
+*mp4
+*h264
+*mp3
