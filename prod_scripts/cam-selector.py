@@ -2,8 +2,7 @@
 import gi
 import time
 import threading
-import stat
-import os
+import paho.mqtt.client as mqtt
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from pyvars import *
@@ -37,22 +36,25 @@ pipeline = Gst.parse_launch(s)
 pipeline.set_state(Gst.State.PLAYING)
 idx = 0
 
-def control():
-     FIFO="/tmp/camselectorfifo"
-     if os.path.exists(FIFO):
-          if not stat.S_ISFIFO(os.stat(FIFO).st_mode):
-               os.remove(FIFO)
-               os.mkfifo(FIFO)
-     else:
-          os.mkfifo(FIFO)
+# The callback for when the client receives a CONNACK response from the server.
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
 
-     while True:
-        with open(FIFO) as fifo:
-            line=fifo.read().strip()
-            print("Got: ", line)
-            val = line.strip()
-            if val == "2":
-                switch_camera(val)
+    # Subscribing in on_connect() means that if we lose the connection and
+    # reconnect then subscriptions will be renewed.
+    client.subscribe("video/cam-selector")
+
+# The callback for when a PUBLISH message is received from the server.
+def on_message(client, userdata, msg):
+    print(msg.topic+" "+str(msg.payload))
+    if msg.topic == "video/cam-selector":
+        switch_camera(str(msg.payload))
+
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+
+client.connect("192.168.2.123", 1883, 60)
 
 
 def switch_camera(target):
@@ -68,7 +70,7 @@ def switch_camera(target):
     print("Switched to %d" % idx)
 
 print("Waiting for input on /tmp/camselectorfifo")
-t = threading.Thread(target=control, daemon=False)
+t = threading.Thread(target=client.loop_forever, daemon=False)
 time.sleep(1)
 t.start()
 t.join()
