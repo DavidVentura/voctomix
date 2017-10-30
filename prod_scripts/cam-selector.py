@@ -34,19 +34,42 @@ pipeline = Gst.parse_launch(s)
 pipeline.set_state(Gst.State.PLAYING)
 idx = 0
 
-while True:
-    print("Waiting for input")
-    i = input()
-    if i == "2":
-        idx = 1
-    elif i == "1":
+def control():
+     FIFO="/tmp/camselectorfifo"
+     if os.path.exists(FIFO):
+          if not stat.S_ISFIFO(os.stat(FIFO).st_mode):
+               os.remove(FIFO)
+               os.mkfifo(FIFO)
+     else:
+          os.mkfifo(FIFO)
+
+     while True:
+        with open(FIFO) as fifo:
+            line=fifo.read().strip()
+            print("Got: ", line)
+            if "=" not in line:
+                 print("Invalid line.")
+                 continue
+            val = line.strip()
+            if val == "2":
+                switch_camera(val)
+
+
+def switch_camera(target):
+    try:
+        idx = int(target)
+        idx -= 1
+    except:
         idx = 0
-    else:
-        print("Invalid input")
-        continue
+    idx = max(0, min(1, idx))
     switch = pipeline.get_by_name('in')
     newpad = switch.get_static_pad('sink_%d' % idx)
     switch.set_property("active-pad", newpad)
     print("Switched to %d" % idx)
 
+print("Waiting for input on /tmp/camselectorfifo")
+t = threading.Thread(target=control, daemon=False)
+time.sleep(1)
+t.start()
+t.join()
 pipeline.set_state(Gst.State.NULL)
