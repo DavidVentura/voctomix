@@ -68,7 +68,7 @@ class wstomqtt():
         try:
             self.ws.connect(target)
         except Exception as e:
-            log(e)
+            print(e)
             if timeout is None:
                 timeout = 2
             timeout = min(timeout, 90)
