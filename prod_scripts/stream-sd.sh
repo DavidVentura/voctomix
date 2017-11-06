@@ -5,7 +5,7 @@ MAXRATE=1000
 MAXRATE=750
 
 # -qmax 30 -qmin 24 \
-ffmpeg -y -nostdin -hide_banner -loglevel warning -stats \
+exec ffmpeg -y -nostdin -hide_banner -loglevel warning -stats \
 	-i tcp://localhost:15000 \
 	-threads:0 3 \
 	-aspect 16:9 \
