@@ -7,7 +7,7 @@ fi
 
 AUDIOSRC='audiotestsrc freq=400 volume=0'
 AUDIOSRC='d. ! queue ! mpegaudioparse ! avdec_mp3 ! queue' 
-gst-launch-1.0 -q \
+exec gst-launch-1.0 -q \
     udpsrc address=239.255.42.42 port=5004 do-timestamp=true ! queue !\
     tsdemux name=d !\
     queue ! h264parse ! avdec_h264 !\
