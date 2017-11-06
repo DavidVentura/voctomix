@@ -4,6 +4,7 @@ import subprocess
 import paho.mqtt.client as mqtt
 import os.path
 import shlex
+import socket
 import json
 import time
 from pprint import pprint
@@ -17,7 +18,33 @@ pmap = {
         "r_blank_t": ['./timer.py'],
         "p_stream": ['./stream-sd.sh']
         }
+modes = {
+        "slides": [
+            "set_stream_live",
+            "set_video_a slides",
+            "set_video_b cam1",
+            "set_composite_mode side_by_side_preview"
+         ],
+        "full": [
+            "set_stream_live",
+            "set_video_a cam1",
+            "set_composite_mode fullscreen",
+            "set_audio_volume mic1 1"
+        ],
+        "fullslides": [
+            "set_stream_live",
+            "set_video_a slides",
+            "set_composite_mode fullscreen",
+            "set_audio_volume mic1 1",
+            "set_audio_volume slides 1"
+        ],
+        "blank": [
+            "set_stream_blank nostream",
+        ]
+}
 ptable = {}
+last_hb = time.time() * 1000
+heartbeats = {}
 
 
 def popenAndCall(key, args):
@@ -33,6 +60,8 @@ def popenAndCall(key, args):
         print(key, args, popenArgs)
         proc = subprocess.Popen(popenArgs, cwd=BASEDIR)
         ptable[key] = proc
+        pstate = map_state()
+        client.publish('mqtt_state', json.dumps({'pstate':pstate}))
         proc.wait()
         if key in ptable:
             del ptable[key]
@@ -50,22 +79,30 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("video/#")
 
 
-# The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    if msg.topic == "video/heartbeat":
-        # FIXME
-        return
-
+    global last_hb
     payload = msg.payload.decode('utf-8', errors='replace')
+    if msg.topic == "video/heartbeat":
+        send_hb = True
+        ctime = time.time() * 1000
+        heartbeats[payload] = ctime
+        if ctime - last_hb < 8000: # If I have sent a hb in the last 8s, abort
+            return
+        last_hb = ctime
+
+    data = payload
     try:
-        data = json.loads(payload)
+        if msg.topic != "video/heartbeat":
+            data = json.loads(payload)
+            print(msg.topic, data)
     except Exception as e:
         print("JSON Parse failed", payload)
-        return
 
-    print(msg.topic, data)
     if msg.topic == "video/stop":
         key = data
+        if type(key) != str:
+            print(key, "is not a string!")
+            return
         if key not in ptable:
             print("Process %s not running(2)!" % key)
             pprint(ptable)
@@ -81,6 +118,7 @@ def on_message(client, userdata, msg):
         # example payload:
         # r_slides_bg PEFE - Abordaje Cosmiátrico
         if 'key' not in data:
+            pprint(data)
             print("No key in data")
             return
         key = data['key']
@@ -101,21 +139,38 @@ def on_message(client, userdata, msg):
         print("Calling popen with args = ", args)
         popenAndCall(key, args)
     elif msg.topic == "video/mode":
-        print("mode!")
+        print("mode!", data)
         nc(data)
         # pstate['mode'] = data
     elif msg.topic == "video/exited":
         if data in ptable:
             del ptable[data]
 
-    pstate = {k: True for k, v in ptable.items() if v is not None}
-    client.publish('mqtt_state', json.dumps(pstate))
-    pprint(pstate)
-    print("#"*50)
+    pstate = map_state()
+    tosend = { 'pstate': pstate, 'heartbeats': heartbeats }
+    client.publish('mqtt_state', json.dumps(tosend))
 
 
+def map_state():
+    return {k: True for k, v in ptable.items() if v is not None}
 def nc(mode):
-    pass
+    if mode not in modes:
+        print(mode, "not in modes")
+        return
+    hostname = 'localhost'
+    port = 9999
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((hostname, port))
+        for line in modes[mode]:
+            line = "%s\n" % line
+            print(line)
+            s.sendall(line.encode())
+            time.sleep(0.1)
+        s.shutdown(socket.SHUT_WR)
+        s.close()
+    except Exception as e:
+        print(e)
 
 
 client = mqtt.Client()
