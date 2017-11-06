@@ -1,0 +1,13 @@
+[Unit]
+Description=voctomix service
+After=networking.service
+Requires=networking.service
+
+[Service]
+User=nginx
+ExecStart=/home/nginx/voctomix/voctocore/voctocore.py -vv
+RestartSec=5
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

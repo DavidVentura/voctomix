@@ -1,0 +1,14 @@
+[Unit]
+Description=ws to mqtt service
+After=networking.service
+Requires=networking.service
+
+[Service]
+User=nginx
+ExecStart=/home/nginx/voctomix/prod_scripts/ws-to-mqtt.py
+RestartSec=5
+Restart=on-failure
+WorkingDirectory=/home/nginx/voctomix/prod_scripts/
+
+[Install]
+WantedBy=multi-user.target
