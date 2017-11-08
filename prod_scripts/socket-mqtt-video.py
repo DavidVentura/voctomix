@@ -12,7 +12,7 @@ BASEDIR = '/home/nginx/voctomix/prod_scripts/'
 pmap = {
         "r_slides": ['./slides2.sh'],
         "r_slides_bg": ['./bg-with-text.sh'],
-        "r_cams": ['./cam-selector.py'],
+        "r_cams": ['./fancy-cam-selector.py'],
         "r_blank_v": ['./blanker.py'],
         "r_blank_m": ['./source-nostream-music-from-folder.py', '/home/nginx/voctomix/'],
         "r_blank_t": ['./timer.py'],
