@@ -45,6 +45,7 @@ modes = {
 ptable = {}
 last_hb = time.time() * 1000
 heartbeats = {}
+cur_state = {}
 
 
 def popenAndCall(key, args):
@@ -60,8 +61,7 @@ def popenAndCall(key, args):
         print(key, args, popenArgs)
         proc = subprocess.Popen(popenArgs, cwd=BASEDIR)
         ptable[key] = proc
-        pstate = map_state()
-        client.publish('mqtt_state', json.dumps({'pstate':pstate}))
+        publish_state()
         proc.wait()
         if key in ptable:
             del ptable[key]
@@ -80,7 +80,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
-    global last_hb
+    global last_hb, cur_state
     payload = msg.payload.decode('utf-8', errors='replace')
     if msg.topic == "video/heartbeat":
         send_hb = True
@@ -136,23 +136,35 @@ def on_message(client, userdata, msg):
             args = data['args']
         else:
             args = []
+
+        if key in ['r_blank_t', 'r_slides_bg']:
+            cur_state[key] = args
+
         print("Calling popen with args = ", args)
         popenAndCall(key, args)
+
+    elif msg.topic == "video/cam-selector":
+        cur_state['camara'] = data
     elif msg.topic == "video/mode":
         print("mode!", data)
         nc(data)
-        # pstate['mode'] = data
+        cur_state['mode'] = data
     elif msg.topic == "video/exited":
         if data in ptable:
             del ptable[data]
+    publish_state()
 
+
+def publish_state():
     pstate = map_state()
-    tosend = { 'pstate': pstate, 'heartbeats': heartbeats }
+    tosend = { 'pstate': pstate, 'heartbeats': heartbeats, 'cur_state': cur_state }
     client.publish('mqtt_state', json.dumps(tosend))
 
 
 def map_state():
     return {k: True for k, v in ptable.items() if v is not None}
+
+
 def nc(mode):
     if mode not in modes:
         print(mode, "not in modes")
