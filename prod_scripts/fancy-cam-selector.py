@@ -49,6 +49,8 @@ def create_pipeline():
 
     pipeline = Gst.Pipeline.new("mypipeline")
     pipeline.bus.add_signal_watch()
+    pipeline.bus.connect("message::eos", on_eos)
+    pipeline.bus.connect("message::error", on_error)
 
     main_cam = Gst.ElementFactory.make('tcpclientsrc', 'main_cam')
     main_cam.set_property("blocksize", 16384)
@@ -121,6 +123,25 @@ def create_pipeline():
 
     return pipeline
 
+
+def on_eos(bus, message):
+    print("EOS")
+    print(bus, message)
+    restart_pipeline()
+
+def on_error(bus, message):
+    print("ERROR")
+    print(bus, message)
+    restart_pipeline()
+
+def restart_pipeline():
+    global pipeline
+    pipeline.set_state(Gst.State.NULL)
+    time.sleep(1)
+
+    pipeline = create_pipeline()
+    print("Pipeline re-created")
+    pipeline.set_state(Gst.State.PLAYING)
 
 def c_d_src_c(target):
     def decode_src_created(element, pad):
