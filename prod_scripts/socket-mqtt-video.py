@@ -89,6 +89,8 @@ def on_message(client, userdata, msg):
         if ctime - last_hb < 8000: # If I have sent a hb in the last 8s, abort
             return
         last_hb = ctime
+        publish_heartbeat()
+        return
 
     data = payload
     try:
@@ -153,6 +155,12 @@ def on_message(client, userdata, msg):
         if data in ptable:
             del ptable[data]
     publish_state()
+
+
+def publish_heartbeat():
+    pstate = map_state()
+    tosend = { 'pstate': pstate, 'heartbeats': heartbeats }
+    client.publish('mqtt_state', json.dumps(tosend))
 
 
 def publish_state():
