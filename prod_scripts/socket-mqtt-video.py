@@ -24,6 +24,7 @@ modes = {
             "set_video_a slides",
             "set_video_b cam1",
             "set_composite_mode side_by_side_preview"
+            "set_audio_volume mic1 1"
          ],
         "full": [
             "set_stream_live",
